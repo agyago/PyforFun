@@ -3,8 +3,11 @@
 import datetime
 from pathlib import Path
 import shutil
+import sys
 
-myfile = Path("/Users/ayago/Desktop/testfolder")
+cur_dir = sys.argv[1] if len(sys.argv) > 1 else '.'
+myfile = Path(cur_dir)
+
 extentionpaths = { '.png': 'Image', '.jpg': 'Image','.docx': 'Document', '.rpm': 'Package'}
 for file in myfile.iterdir():
    if file.is_file() and file.name != '.DS_Store':
