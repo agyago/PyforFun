@@ -86,7 +86,7 @@ extentionpaths = { '.png'  : 'Image',
                    '.itermcolors': 'Unknown'
                    }
 
-def rename_file(source: Path, subpath: Path):
+def rename_file(file, subpath: Path):
     if Path(subpath / file.name).exists():
         increment = 0
         while True:
@@ -97,20 +97,26 @@ def rename_file(source: Path, subpath: Path):
     else:
         return subpath/file.name
 
-for file in myfile.iterdir():
-   if file.is_file() and file.name != '.DS_Store':
-       date = file.stat().st_mtime
-       year = datetime.datetime.fromtimestamp(date).strftime("%Y")
-       month = datetime.datetime.fromtimestamp(date).strftime("%B")
-       rootpath= myfile.joinpath(extentionpaths[file.suffix])
-       newpath = rootpath.joinpath(year)
-       subpath = newpath.joinpath(month)
-       if file.suffix in extentionpaths:
-           if not rootpath.exists():
-               rootpath.mkdir()
-           if not newpath.exists():
-               newpath.mkdir()
-           if not subpath.exists():
-               subpath.mkdir()
-           subpath = rename_file(source = file, subpath=subpath)                  
-           shutil.move(file,subpath)
+def file_iter(myfile):
+    for file in myfile.iterdir():
+        if file.is_file() and file.name != '.DS_Store':
+            date = file.stat().st_mtime
+            year = datetime.datetime.fromtimestamp(date).strftime("%Y")
+            month = datetime.datetime.fromtimestamp(date).strftime("%B")
+            rootpath= myfile.joinpath(extentionpaths[file.suffix])
+            newpath = rootpath.joinpath(year)
+            subpath = newpath.joinpath(month)
+        
+            if file.suffix in extentionpaths:
+                if not rootpath.exists():
+                    rootpath.mkdir()
+                if not newpath.exists():
+                    newpath.mkdir()
+                if not subpath.exists():
+                    subpath.mkdir()
+                subpath = rename_file(file, subpath=subpath)
+                                 
+                shutil.move(file,subpath)
+
+if __name__ == '__main__':
+   file_iter(myfile)
