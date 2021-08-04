@@ -52,7 +52,7 @@ extentionpaths = { '.png'  : 'Image',
                    '.rb'   : 'RubyFile',
                    '.ps1'  : 'PowerShell',
                    '.sh'   : 'shellscripts',
-                   '.app'  : 'Application',
+                   '.app'  : 'Apps',
                    '.crt'  : 'certificate',
                    '.cert' : 'certificate',
                    '.cer'  : 'certificate',
@@ -86,6 +86,12 @@ extentionpaths = { '.png'  : 'Image',
                    '.itermcolors': 'Unknown'
                    }
 
+def cert_name(file, rootpath: Path, subpath: Path):
+        certdir = subpath.joinpath(file.stem)
+        if not certdir.exists():
+            certdir.mkdir()
+        return certdir/file.name
+
 def rename_file(file, subpath: Path):
     if Path(subpath / file.name).exists():
         increment = 0
@@ -97,13 +103,14 @@ def rename_file(file, subpath: Path):
     else:
         return subpath/file.name
 
+
 def file_iter(myfile):
     for file in myfile.iterdir():
         if file.is_file() and file.name != '.DS_Store':
             date = file.stat().st_mtime
             year = datetime.datetime.fromtimestamp(date).strftime("%Y")
             month = datetime.datetime.fromtimestamp(date).strftime("%B")
-            rootpath= myfile.joinpath(extentionpaths[file.suffix])
+            rootpath= myfile.joinpath(extentionpaths[file.suffix])          
             newpath = rootpath.joinpath(year)
             subpath = newpath.joinpath(month)
         
@@ -113,9 +120,11 @@ def file_iter(myfile):
                 if not newpath.exists():
                     newpath.mkdir()
                 if not subpath.exists():
-                    subpath.mkdir()
-                subpath = rename_file(file, subpath=subpath)
-                                 
+                    subpath.mkdir()              
+                if rootpath.name == 'certificate':
+                    subpath = cert_name(file, rootpath=rootpath, subpath=subpath)
+                else:
+                    subpath = rename_file(file, subpath=subpath)                                             
                 shutil.move(file,subpath)
 
 if __name__ == '__main__':
